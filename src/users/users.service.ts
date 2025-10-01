@@ -66,31 +66,4 @@ export class UsersService {
         this.logger.log(`users.service 신규 사용자임 등록 하겠음 id=${saved.id} nickname=${saved.nickname}`);
         return saved;
     }
-
-    // 점수저장 근데 여기다 해도 되나?
-    async submitScore(userId: string, score: number) {
-        this.logger.log(`users.service submitScore 점수 저장 | userId=${userId} | score=${score}`);
-
-        const user = await this.findById(userId);
-        if (!user) {
-            this.logger.warn(`점수 저장 실패 | 사용자 없음 | userId=${userId}`);
-            return null;
-        }
-
-        // 최근 점수 담ㄱ기
-        user.lastScore = score;
-
-        // 비교 해서 가장 큰 점수
-        if (score > user.highScore) {
-            this.logger.log(`최고 점수 갱신 | 이전=${user.highScore} → 새=${score}`);
-            user.highScore = score;
-        } else {
-            this.logger.log(`최고 점수 유지 | 현재 최고=${user.highScore} | 최근=${score}`);
-        }
-
-        const saved = await this.repo.save(user);
-        this.logger.log(`점수 저장 완료 | userId=${saved.id} | high=${saved.highScore} | last=${saved.lastScore}`);
-        return saved;
-    }
-
 }
