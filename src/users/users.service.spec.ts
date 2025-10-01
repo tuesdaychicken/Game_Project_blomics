@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersService } from '../users.service';
-import { User } from '../user.entity';
+import { UsersService } from './users.service';
+import { User } from './user.entity';
 
 //쿠키 테스트를 위해 추가
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -82,7 +82,7 @@ describe('UsersService (integration)', () => {
 
         await repo.insert({
             id: cookie,
-            nickname: '나다',
+            nickname: '나다2',
             highScore: 0,
             lastScore: 0,
         });
@@ -92,7 +92,7 @@ describe('UsersService (integration)', () => {
 
         expect(fetched).toBeDefined();
         expect(fetched!.id).toBe(cookie);
-        expect(fetched!.nickname).toBe('나다');
+        expect(fetched!.nickname).toBe('나다2');
     });
 
 });
