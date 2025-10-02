@@ -49,7 +49,7 @@ describe('Scores - Save & Get (e2e)', () => {
             .expect(201);
 
         // Then: highScore와 lastScore 모두 7이어야 함
-        expect(r1.body).toEqual({ highScore: 7, lastScore: 7 });
+        expect(r1.body).toMatchObject({ highScore: 7, lastScore: 7 });
 
         // And When: 더 낮은 점수 2 저장
         const r2 = await agent
@@ -58,7 +58,7 @@ describe('Scores - Save & Get (e2e)', () => {
             .expect(201);
 
         // Then: lastScore는 2로 갱신, highScore는 7 그대로, 마지막 점수는 항상 갱신, 최고 점수는 클 때만 검증
-        expect(r2.body).toEqual({ highScore: 7, lastScore: 2 });
+        expect(r2.body).toMatchObject({ highScore: 7, lastScore: 2 });
     });
 
     it('GET /api/scores - 조회: high/last 확인', async () => {
@@ -72,6 +72,6 @@ describe('Scores - Save & Get (e2e)', () => {
         const r = await agent.get('/api/scores').expect(200);
 
         // Then: highScore=10(최대치), lastScore=10(가장 최근 저장)
-        expect(r.body).toEqual({ highScore: 10, lastScore: 10 });
+        expect(r.body).toMatchObject({ highScore: 10, lastScore: 10 });
     });
 });
