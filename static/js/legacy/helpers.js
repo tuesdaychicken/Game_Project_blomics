@@ -1,4 +1,5 @@
 // 최초 저장
+// static/js/helper.js
 function lsSet(key, val) {
     try { localStorage.setItem(String(key), String(val)); } catch (e) {}
 }

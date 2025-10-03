@@ -6,22 +6,22 @@
     <title>게임 화면</title>
 </head>
 <body>
-<h1>게임 화면</h1>
 
-<p id="player-line">플레이어는: (로딩 중)</p>
-<p id="uid-line">uid: (로딩 중)</p>
+<!-- 로비 섹션: 시작/점수확인 -->
+<section id="lobby">
+    <button id="btn-start" type="button">게임 시작</button>
+    <button id="btn-check" type="button">점수 확인</button>
+    <a href="/">닉네임 변경</a>
+</section>
 
-<hr/>
-<h2>점수</h2>
-<p id="score-line">현재 점수: 0</p>
+<!-- 게임 섹션: 실제 게임 UI(예시로 플레이/종료 버튼만 배치) -->
+<section id="play" style="display:none;">
+    <!-- 여기에 실제 게임 캔버스/화면 구성 -->
+    <p>게임 진행 중...</p>
+    <button id="btn-finish" type="button">게임 종료(예시)</button>
+</section>
 
-<!--점수 잘 작동하는지 테스트-->
-<button id="btn-plus">+1</button>
-<button id="btn-reset">초기화</button>
-
-<p><a href="/">초기 화면으로</a></p>
-
-<script src="./js/helpers.js"></script>
-<script src="./js/game.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/game.page.js"></script>
 </body>
 </html>
