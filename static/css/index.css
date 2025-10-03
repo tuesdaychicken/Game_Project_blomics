@@ -1,0 +1,105 @@
+/* 전체 레이아웃: 중앙 정렬 (상단 정렬이면 align-items:flex-start) */
+
+html, body {
+    height: 100%;
+}
+body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 24px;
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    background: #fff;
+    color: #111827;
+}
+
+/* 래퍼: 세로 스택 */
+.wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 560px;
+}
+
+/* 카드 */
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    background: #fff;
+}
+
+/* 타이틀 */
+.title {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* 폼 */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.label {
+    font-size: 13px;
+    color: #6b7280;
+}
+.input {
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+}
+.input:focus {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+}
+
+/* 버튼/액션 */
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    border: 1px solid #d1d5db;
+    background: #f9fafb;
+    font-size: 14px;
+    cursor: pointer;
+}
+.btn.primary {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #fff;
+}
+.btn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+/* 텍스트 헬퍼 */
+.muted { color: #6b7280; }
+.warn  { color: #b45309; }
+.small { font-size: 13px; }
+
+/* 유틸 */
+.hidden { display: none !important; }

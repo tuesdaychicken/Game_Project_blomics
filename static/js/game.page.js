@@ -3,6 +3,7 @@
 (function () {
     const btnStart = document.getElementById('btn-start');
     const btnCheck = document.getElementById('btn-check');
+    const nickEl   = document.getElementById('current-nickname');
 
     // 진입 시 계정 확인 (쿠키/세션 없으면 닉네임 등록으로)
     (async () => {

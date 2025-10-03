@@ -58,7 +58,7 @@
 
         // 정상 렌더
         statusEl.textContent = '불러오기 완료';
-        cardEl.style.display = '';
+        cardEl.classList.remove('hidden');
         nickEl.textContent = `반가워요, ${me.nickname} 님`;
         highEl.textContent = Number.isFinite(me.highScore) ? me.highScore : 0;
         lastEl.textContent = Number.isFinite(me.lastScore) ? me.lastScore : 0;

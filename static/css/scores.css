@@ -1,0 +1,76 @@
+html, body {
+    height: 100%;
+}
+body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 24px;
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    background: #fff;
+    color: #111827;
+}
+
+/* 래퍼: 세로 스택 */
+.wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 560px;
+}
+
+/* 카드: 세로 스택 */
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    background: #fff;
+}
+
+/* 타이틀 */
+.title {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+}
+
+/* 한 줄(레이블-값) */
+.row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 0;
+}
+.row + .row {
+    border-top: 1px dashed #e5e7eb;
+}
+
+/* 상태/텍스트 */
+.muted { color: #6b7280; }
+.warn  { color: #b45309; }
+
+/* 버튼들 */
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    border: 1px solid #d1d5db;
+    background: #f9fafb;
+}
+
+/* 유틸: 숨김 */
+.hidden { display: none !important; }

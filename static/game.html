@@ -3,16 +3,43 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <link rel="stylesheet" href="/css/game.css">
     <title>게임 화면</title>
 </head>
 <body>
+<div class="wrap">
+    <h1>게임</h1>
 
-<!-- 로비 섹션 -->
-<section id="lobby">
-    <button id="btn-start" type="button">게임 시작</button>
-    <button id="btn-check" type="button">점수 확인</button>
-    <a href="/">닉네임 변경</a>
-</section>
+    <!-- 플레이어 정보 카드 -->
+    <div class="card">
+        <div class="title">플레이어</div>
+        <p class="muted">안녕하세요, <strong id="current-nickname">-</strong> 님</p>
+        <div class="actions">
+            <a class="btn" href="/scores.html">점수 확인</a>
+            <a class="btn" href="/">닉네임 변경</a>
+        </div>
+    </div>
+
+    <!-- 로비 -->
+    <section id="lobby" class="card" data-section="lobby">
+        <div class="title">로비</div>
+        <p class="muted small">게임을 시작해 보세요.</p>
+        <div class="actions">
+            <button id="btn-start" class="btn primary" type="button">게임 시작</button>
+            <a class="btn" href="/scores.html">점수 확인</a>
+        </div>
+    </section>
+
+    <!-- 플레이 -->
+    <section id="play" class="card hidden" data-section="play">
+        <div class="title">플레이</div>
+        <p class="muted">게임 진행 중...</p>
+        <div class="actions">
+            <button id="btn-finish" class="btn" type="button">게임 종료(예시)</button>
+            <button id="btn-cancel" class="btn" type="button">로비로 돌아가기</button>
+        </div>
+    </section>
+</div>
 
 <script src="/js/api.js" defer></script>
 <script src="/js/game.page.js" defer></script>

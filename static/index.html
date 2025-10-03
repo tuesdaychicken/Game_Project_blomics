@@ -3,27 +3,41 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/css/index.css">
     <title>초기 화면</title>
 </head>
-<!-- index.html -->
 <body>
+<div class="wrap">
+    <h1>시작하기</h1>
 
-<!--쿠키여부 확인 없으면 보이게-->
-<main id="index-root" hidden>
+    <div class="card">
+        <div class="title">닉네임 등록</div>
 
-<!-- 닉네임 등록 폼 -->
-<form id="nickname-form" style="margin-bottom: 12px;">
-    <input id="nickname-input" placeholder="닉네임을 입력하세요" autocomplete="off" />
-    <button id="nickname-submit" type="submit">등록</button>
-    <small id="nickname-help" style="margin-left:8px;color:#666;"></small>
-</form>
+        <form id="nickname-form" class="form">
+            <div class="field">
+                <label for="nickname-input" class="label">닉네임</label>
+                <input id="nickname-input" type="text" class="input" placeholder="닉네임을 입력하세요"/>
+            </div>
 
-<!-- (이미 등록된 경우 바로 이동할 수 있는 링크) -->
-<a href="/game.html">게임으로 이동</a>
+            <p id="nickname-help" class="muted small">등록하면 게임을 시작할 수 있어요.</p>
 
-</main>
+            <div class="actions">
+                <!-- 등록 버튼 (기존 JS가 이 id를 사용) -->
+                <button id="nickname-submit" type="submit" class="btn primary">등록</button>
+                <!-- 이미 등록한 경우 바로 게임으로 (라우팅 방식에 맞춰 경로 선택) -->
+                <a class="btn" href="/game.html">게임으로 이동</a>
+                <!-- 라우터 기반이면 위 경로를 /game 으로 바꿔도 됩니다 -->
+            </div>
+        </form>
+    </div>
 
-<script src="/js/api.js"></script>
-<script src="/js/index.page.js"></script>
+    <div class="card">
+        <div class="title small">안내</div>
+        <p class="muted small">이미 닉네임이 있으면 “게임으로 이동”을 누르거나, 자동 리다이렉트를 켜려면 나중에 알려준 스니펫을 적용하세요.</p>
+    </div>
+</div>
+
+<script src="/js/api.js" defer></script>
+<script src="/js/index.page.js" defer></script>
 </body>
 </html>
