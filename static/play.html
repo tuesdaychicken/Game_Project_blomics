@@ -8,13 +8,36 @@
 <body>
 
 <section id="play">
-    <!-- 여기에 실제 게임 캔버스/컴포넌트 배치 -->
     <p>게임 진행 중...</p>
-
-    <!-- 데모: 종료/취소 -->
     <button id="btn-finish" type="button">게임 종료(예시)</button>
     <button id="btn-cancel" type="button">로비로 돌아가기</button>
 </section>
+
+<div id="end-modal" style="
+        display:none; position:fixed; inset:0;
+        background:rgba(0,0,0,.5); z-index:9999;
+        align-items:center; justify-content:center;">
+    <div style="
+        background:#fff; border-radius:12px; padding:20px; width:min(92vw,420px);
+        box-shadow:0 10px 30px rgba(0,0,0,.2); text-align:center;">
+        <h2 style="margin:0 0 8px; font-size:20px;">게임 종료</h2>
+        <p style="margin:0 0 12px; color:#6b7280;">게임이 종료 됐어요!</p>
+        <div style="display:flex; gap:12px; justify-content:space-between; padding:10px 0;">
+            <div style="flex:1; border:1px dashed #e5e7eb; border-radius:10px; padding:10px;">
+                <div style="color:#6b7280; font-size:12px;">이번 점수</div>
+                <div id="end-score" style="font-weight:700; font-size:24px;">0</div>
+            </div>
+            <div style="flex:1; border:1px dashed #e5e7eb; border-radius:10px; padding:10px;">
+                <div style="color:#6b7280; font-size:12px;">최고 점수</div>
+                <div id="end-high" style="font-weight:700; font-size:24px;">0</div>
+            </div>
+        </div>
+        <button id="btn-end-ok" type="button" style="
+          margin-top:12px; padding:10px 16px; border:1px solid #d1d5db;
+          border-radius:8px; background:#f9fafb;">확인
+        </button>
+    </div>
+</div>
 
 <script src="/js/api.js" defer></script>
 <script src="/js/play.page.js" defer></script>

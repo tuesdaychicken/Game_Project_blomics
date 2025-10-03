@@ -4,7 +4,13 @@
     const btnFinish = document.getElementById('btn-finish');
     const btnCancel = document.getElementById('btn-cancel');
 
-    // 페이지 진입 시에도 계정 확인
+    // 종료 모달 요소
+    const endModal   = document.getElementById('end-modal');
+    const endScoreEl = document.getElementById('end-score'); // 이번 점수
+    const endHighEl  = document.getElementById('end-high');  // 최고 점수
+    const btnEndOk   = document.getElementById('btn-end-ok');
+
+    // 진입 시 계정 확인
     (async () => {
         try {
             const me = await API.me();
@@ -12,7 +18,7 @@
                 alert('세션이 만료되었거나 닉네임이 없습니다. 로비로 이동합니다.');
                 location.href = '/';
             }
-            // TODO: 여기에서 실제 게임 시작 로직을 불러오세요. 네
+            // 실제게임 로직 여기
         } catch (e) {
             console.error('[play] /me 실패:', e);
             alert('서버 연결에 문제가 있습니다.');
@@ -20,15 +26,59 @@
         }
     })();
 
-    // 실제 게임에서 최종 점수를 확정하면 이 함수만 호출하면 됨
+    // /api/scores 저장 호출 (API.saveScore 있으면 사용, 없으면 fetch fallback)
+    async function saveScore(score) {
+        if (window.API && typeof API.saveScore === 'function') {
+            return await API.saveScore(score); // 기대 응답: { highScore, lastScore }
+        }
+        // 직접 호출
+        const res = await fetch('/api/scores', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ score })
+        });
+        if (!res.ok) {
+            const text = await res.text().catch(() => '');
+            const err = new Error(`HTTP ${res.status}: ${text.slice(0,120)}`);
+            // 상태코드도 달아줌
+            err.status = res.status;
+            throw err;
+        }
+        const ct = res.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) {
+            const text = await res.text().catch(() => '');
+            throw new Error(`NON_JSON 응답: ${text.slice(0,120)}`);
+        }
+        return res.json(); // { highScore, lastScore }
+    }
+
+    // 모달 열기/닫기
+    function openEndModal({ current, high }) {
+        if (endScoreEl) endScoreEl.textContent = String(current);
+        if (endHighEl)  endHighEl.textContent  = String(high);
+        if (endModal)   endModal.style.display = 'flex';
+    }
+    function closeEndModal() {
+        if (endModal) endModal.style.display = 'none';
+    }
+
+    // 게임 종료 시 호출 (랜덤/실제 점수 모두 지원)
     async function onGameOver(score) {
         if (!Number.isFinite(score)) {
             console.warn('[play] 잘못된 score:', score);
             return;
         }
         try {
-            await API.saveScore(score);          // POST /api/scores
-            location.href = '/scores.html';      // 저장 성공 → 점수 페이지
+            // 서버로 점수 저장
+            const saved = await saveScore(score); // { highScore, lastScore }
+
+            // 응답 기준으로 표시값 결정 (없으면 안전한 대체값)
+            const high = Number.isFinite(saved?.highScore) ? saved.highScore : score;
+            const last = Number.isFinite(saved?.lastScore)  ? saved.lastScore  : score;
+
+            // 모달로 결과 노출 (이번 점수 = last, 최고 점수 = high)
+            openEndModal({ current: last, high });
         } catch (err) {
             console.error('[play] 점수 저장 실패:', err);
             if (err?.status === 401) {
@@ -42,14 +92,20 @@
         }
     }
 
-    // 데모: 종료 버튼은 랜덤 점수 저장
+    // 랜덤 점수 저장/표시
     btnFinish?.addEventListener('click', () => {
-        const score = Math.floor(Math.random() * 20);
-        onGameOver(score);
+        const randomScore = Math.floor(Math.random() * 100); // 0~99 임의 점수
+        onGameOver(randomScore);
     });
 
-    // 취소 → 로비로
+    // 취소
     btnCancel?.addEventListener('click', () => {
+        location.href = '/game.html';
+    });
+
+    // 모달 확인, 로비로 이동
+    btnEndOk?.addEventListener('click', () => {
+        closeEndModal();
         location.href = '/game.html';
     });
 
