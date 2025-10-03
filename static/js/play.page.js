@@ -100,13 +100,13 @@
 
     // 취소
     btnCancel?.addEventListener('click', () => {
-        location.href = '/game.html';
+        location.href = '/game';
     });
 
     // 모달 확인, 로비로 이동
     btnEndOk?.addEventListener('click', () => {
         closeEndModal();
-        location.href = '/game.html';
+        location.href = '/game';
     });
 
     // 실제 게임 엔진에서 호출할 수 있도록 전역 공개

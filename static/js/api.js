@@ -41,7 +41,7 @@ const API = (() => {
             }).then(handle),
 
         getScores: () =>
-            fetch(`${BASE}/scores`, {
+            fetch(`${BASE}/scores/me`, {
                 credentials: 'same-origin',
             }).then(handle),
     };

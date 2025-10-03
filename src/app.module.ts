@@ -20,6 +20,9 @@ import {UsersModule} from './users/users.module';
 // 스코어 모듈과 연결하기
 import {ScoresModule} from "./scores/scores.module";
 
+//경로 모듈 연결
+import { PagesModule } from './pages/pages.module';
+
 @Module({
     imports: [
 
@@ -66,6 +69,7 @@ import {ScoresModule} from "./scores/scores.module";
         //유저 모듈 연결
         UsersModule,
         ScoresModule,
+        PagesModule,
     ],
     // 기본으로 생성된 컨트롤러/서비스를 등록(있어도 되고 없어도 됨)
     controllers: [AppController],

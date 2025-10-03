@@ -44,10 +44,10 @@ export class ScoresController {
     }
 
     // 점수 조회
-    @Get()
+    @Get('me')
     async getScores(@Req() req: Request) {
         const uid = req.cookies?.uid;
-        this.logger.log(`GET /scores, 점수 불러오기, uid=${uid ?? '없음'}`);
+        this.logger.log(`GET /scores/me, 점수 불러오기, uid=${uid ?? '없음'}`);
 
         //쿠키 없음
         if (!uid) {

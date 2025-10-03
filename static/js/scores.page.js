@@ -51,7 +51,7 @@
             statusEl.textContent = '닉네임이 등록되어 있지 않습니다.';
             actionsEl.innerHTML = `
         <p class="warn">점수를 확인하려면 닉네임 등록이 필요합니다.</p>
-        <a class="btn" href="/game.html">닉네임 등록/게임 시작하기</a>
+        <a class="btn" href="/game">닉네임 등록/게임 시작하기</a>
       `;
             return;
         }
@@ -63,10 +63,10 @@
         highEl.textContent = Number.isFinite(me.highScore) ? me.highScore : 0;
         lastEl.textContent = Number.isFinite(me.lastScore) ? me.lastScore : 0;
 
-        actionsEl.innerHTML = `<a class="btn" href="/game.html">게임 하러 가기</a>`;
+        actionsEl.innerHTML = `<a class="btn" href="/game">게임 하러 가기</a>`;
     } catch (err) {
         console.error('[scores] /me 호출 실패:', err);
         statusEl.textContent = '점수 정보를 불러오지 못했습니다. (개발자 콘솔 확인)';
-        actionsEl.innerHTML = `<a class="btn" href="/game.html">다시 시도</a>`;
+        actionsEl.innerHTML = `<a class="btn" href="/game">다시 시도</a>`;
     }
 })();

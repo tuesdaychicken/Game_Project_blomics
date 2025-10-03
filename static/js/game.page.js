@@ -21,11 +21,11 @@
 
     //플레이 페이지로
     btnStart?.addEventListener('click', () => {
-        location.href = '/play.html';
+        location.href = '/play';
     });
 
     //점수 페이지로
     btnCheck?.addEventListener('click', () => {
-        location.href = '/scores.html';
+        location.href = '/scores';
     });
 })();
