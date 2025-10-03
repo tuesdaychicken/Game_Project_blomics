@@ -8,12 +8,16 @@
     const help  = document.getElementById('nickname-help');
     const submitBtn = document.getElementById('nickname-submit');
 
-    // 이미 쿠키가 있으면 안내만 하고 사용자가 '게임으로 이동'을 누르게 두거나 자동 리다이렉트도 가능
+    // 이미 쿠키가 있으면 바로 이동
     (async () => {
         try {
             const me = await API.me();
-            if (me.exists) help.textContent = `이미 등록됨: ${me.nickname}`;
-        } catch { /* 무시 */ }
+            if (me?.exists) {
+                // 뒤로가기로 다시 index로 못 돌아오게
+                location.replace('/game');
+                return;
+            }
+        } catch { /* 무시하고 폼 보여줌 */ }
     })();
 
     form.addEventListener('submit', async (e) => {

@@ -7,6 +7,10 @@
 </head>
 <!-- index.html -->
 <body>
+
+<!--쿠키여부 확인 없으면 보이게-->
+<main id="index-root" hidden>
+
 <!-- 닉네임 등록 폼 -->
 <form id="nickname-form" style="margin-bottom: 12px;">
     <input id="nickname-input" placeholder="닉네임을 입력하세요" autocomplete="off" />
@@ -16,6 +20,8 @@
 
 <!-- (이미 등록된 경우 바로 이동할 수 있는 링크) -->
 <a href="/game.html">게임으로 이동</a>
+
+</main>
 
 <script src="/js/api.js"></script>
 <script src="/js/index.page.js"></script>
