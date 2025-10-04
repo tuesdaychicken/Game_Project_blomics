@@ -4,6 +4,7 @@
 // 3단계: 물방울 충돌 시 목숨 감소 + 목숨 0 시 종료
 // 4단계: 동그라미 아이템 추가 (물방울 생성 속도 증가 5초 지속)
 // 5단계: 네모 아이템 추가 (목숨 +1)
+// 6단계: 세모 아이템 추가 (캐릭터 이동속도 증가 5초 지속)
 
 (function () {
     const Engine = {
@@ -23,12 +24,11 @@
 
             // 아이템 설정
             itemRadius: 8,
-            itemSpawnInterval: 3000, // 3초마다 확률적으로 1개
-            itemChance: 0.5,         // 50% 확률
+            itemSpawnInterval: 3000,
+            itemChance: 0.5,
             powerDuration: 5000,
             boostedSpawnInterval: 300,
-
-            maxLives: 5, // 목숨 최대값
+            maxLives: 5,
         },
 
         el: { canvas: null, ctx: null, hudScore: null, hudLives: null },
@@ -48,6 +48,9 @@
 
             boosted: false,
             boostEndTime: 0,
+
+            speedBoosted: false,
+            speedBoostEndTime: 0,
         },
 
         init() {
@@ -87,11 +90,14 @@
         },
 
         update(dt, ts) {
-            // 캐릭터 이동
+            // --- 캐릭터 이동 ---
+            let moveSpeed = this.cfg.moveSpeed;
+            if (this.state.speedBoosted) moveSpeed *= 1.5;
+
             let vx = 0;
             if (this.state.keys['ArrowLeft'] || this.state.keys['a']) vx -= 1;
             if (this.state.keys['ArrowRight'] || this.state.keys['d']) vx += 1;
-            this.state.player.x += vx * this.cfg.moveSpeed * dt;
+            this.state.player.x += vx * moveSpeed * dt;
             this.state.player.x = Math.max(0, Math.min(this.state.player.x, this.cfg.width - this.cfg.playerW));
 
             const groundY = this.cfg.height - this.cfg.groundH;
@@ -141,9 +147,12 @@
             }
             this.state.items = aliveItems;
 
-            // 효과 종료
+            // --- 효과 지속시간 종료 ---
             if (this.state.boosted && ts > this.state.boostEndTime) {
                 this.state.boosted = false;
+            }
+            if (this.state.speedBoosted && ts > this.state.speedBoostEndTime) {
+                this.state.speedBoosted = false;
             }
         },
 
@@ -168,13 +177,21 @@
                 ctx.fill();
             }
 
-            // 아이템
+            // 아이템들
             for (const it of this.state.items) {
                 if (it.type === 'circle') ctx.fillStyle = '#facc15'; // 노랑
                 else if (it.type === 'square') ctx.fillStyle = '#3b82f6'; // 파랑
+                else if (it.type === 'triangle') ctx.fillStyle = '#22c55e'; // 초록
 
                 if (it.type === 'square') {
                     ctx.fillRect(it.x - it.r, it.y - it.r, it.r * 2, it.r * 2);
+                } else if (it.type === 'triangle') {
+                    ctx.beginPath();
+                    ctx.moveTo(it.x, it.y - it.r);
+                    ctx.lineTo(it.x - it.r, it.y + it.r);
+                    ctx.lineTo(it.x + it.r, it.y + it.r);
+                    ctx.closePath();
+                    ctx.fill();
                 } else {
                     ctx.beginPath();
                     ctx.arc(it.x, it.y, it.r, 0, Math.PI * 2);
@@ -183,7 +200,10 @@
             }
 
             // 캐릭터
-            ctx.fillStyle = this.state.boosted ? '#fbbf24' : '#60a5fa';
+            let color = '#60a5fa';
+            if (this.state.boosted) color = '#fbbf24'; // 노란 (circle 효과)
+            if (this.state.speedBoosted) color = '#4ade80'; // 초록 (triangle 효과)
+            ctx.fillStyle = color;
             ctx.fillRect(this.state.player.x, this.state.player.y, this.cfg.playerW, this.cfg.playerH);
 
             this.updateHUD();
@@ -199,8 +219,8 @@
         spawnItem() {
             const pad = this.cfg.dropSpawnPadding;
             const x = Math.random() * (this.cfg.width - 2 * pad) + pad;
-            // 50% 확률로 circle/square 구분
-            const type = Math.random() < 0.5 ? 'circle' : 'square';
+            const types = ['circle', 'square', 'triangle'];
+            const type = types[Math.floor(Math.random() * types.length)];
             this.state.items.push({ x, y: -this.cfg.itemRadius, r: this.cfg.itemRadius, type });
         },
 
@@ -210,9 +230,11 @@
                 this.state.boosted = true;
                 this.state.boostEndTime = ts + this.cfg.powerDuration;
             } else if (type === 'square') {
-                // 목숨 +1 (최대 5)
                 this.state.lives = Math.min(this.cfg.maxLives, this.state.lives + 1);
                 this.updateHUD();
+            } else if (type === 'triangle') {
+                this.state.speedBoosted = true;
+                this.state.speedBoostEndTime = ts + this.cfg.powerDuration;
             }
         },
 
