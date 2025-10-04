@@ -13,6 +13,10 @@
                 alert('닉네임을 먼저 등록해주세요.');
                 location.href = '/';
             }
+
+            // 닉네임 주입
+            if (nickEl) nickEl.textContent = me.nickname ?? '(닉네임 없음)';
+            
         } catch (e) {
             console.error('[lobby] /me 실패:', e);
             alert('서버 연결에 문제가 있습니다.');
