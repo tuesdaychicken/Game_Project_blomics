@@ -5,31 +5,13 @@
 // 4단계: 동그라미 아이템 추가 (물방울 생성 속도 증가 5초 지속)
 // 5단계: 네모 아이템 추가 (목숨 +1)
 // 6단계: 세모 아이템 추가 (캐릭터 이동속도 증가 5초 지속)
+// 7단계: 마름모 아이템 추가 (물방울 속도/양 감소 5초 지속)
+// 8단계: 난이도 스케일링(경과 시간에 따라 낙하 속도↑, 스폰 간격↓) + 4종 아이템 유지
 
 (function () {
     const Engine = {
-        cfg: {
-            width: 480,
-            height: 720,
-            groundH: 24,
-            playerW: 40,
-            playerH: 40,
-            moveSpeed: 280,
 
-            // 낙하물 설정
-            dropRadius: 6,
-            dropSpeed: 220,
-            dropSpawnInterval: 600,
-            dropSpawnPadding: 8,
-
-            // 아이템 설정
-            itemRadius: 8,
-            itemSpawnInterval: 3000,
-            itemChance: 0.5,
-            powerDuration: 5000,
-            boostedSpawnInterval: 300,
-            maxLives: 5,
-        },
+        cfg: window.GameSettings,
 
         el: { canvas: null, ctx: null, hudScore: null, hudLives: null },
 
@@ -40,16 +22,21 @@
             lives: 1,
             keys: Object.create(null),
             player: { x: 0, y: 0 },
+
             drops: [],
             items: [],
 
+            // 타이머
             spawnAccMs: 0,
             itemAccMs: 0,
+            elapsedMs: 0, // 시작 이후 누적 시간
 
-            boosted: false,
+            // 효과 상태
+            boosted: false,        // ○: 스폰 간격↓
             boostEndTime: 0,
-
-            speedBoosted: false,
+            slowed: false,         // ◇: 속도↓, 스폰 간격↑
+            slowEndTime: 0,
+            speedBoosted: false,   // △: 플레이어 이동속도↑
             speedBoostEndTime: 0,
         },
 
@@ -83,6 +70,7 @@
             if (!this.state.lastTs) this.state.lastTs = ts;
             const dt = Math.min((ts - this.state.lastTs) / 1000, 0.033);
             this.state.lastTs = ts;
+            this.state.elapsedMs += dt * 1000;
 
             this.update(dt, ts);
             this.render();
@@ -90,24 +78,39 @@
         },
 
         update(dt, ts) {
-            // --- 캐릭터 이동 ---
+            // --- 플레이어 이동(△ 효과 시 가속) ---
             let moveSpeed = this.cfg.moveSpeed;
             if (this.state.speedBoosted) moveSpeed *= 1.5;
-
-            let vx = 0;
-            if (this.state.keys['ArrowLeft'] || this.state.keys['a']) vx -= 1;
-            if (this.state.keys['ArrowRight'] || this.state.keys['d']) vx += 1;
-            this.state.player.x += vx * moveSpeed * dt;
+            const dir =
+                (this.state.keys['ArrowRight'] || this.state.keys['d'] ? 1 : 0) +
+                (this.state.keys['ArrowLeft'] || this.state.keys['a'] ? -1 : 0);
+            this.state.player.x += dir * moveSpeed * dt;
             this.state.player.x = Math.max(0, Math.min(this.state.player.x, this.cfg.width - this.cfg.playerW));
 
             const groundY = this.cfg.height - this.cfg.groundH;
 
+            // --- 난이도 스케일 계산(경과 시간 기반) ---
+            const t = this.state.elapsedMs / 1000; // s
+            const baseSpeed = Math.min(
+                this.cfg.baseDropSpeed + this.cfg.difficulty.speedGrowthPerSec * t,
+                this.cfg.difficulty.maxDropSpeed
+            );
+            const baseInterval = Math.max(
+                this.cfg.baseSpawnInterval - this.cfg.difficulty.intervalShrinkPerSec * t,
+                this.cfg.difficulty.minSpawnInterval
+            );
+
+            // 아이템 효과 적용
+            const effectiveDropSpeed = baseSpeed * (this.state.slowed ? this.cfg.effects.slowedSpeedFactor : 1);
+            let effectiveSpawnInterval = baseInterval;
+            if (this.state.boosted) effectiveSpawnInterval *= this.cfg.effects.boostedIntervalFactor; // ○
+            if (this.state.slowed)  effectiveSpawnInterval *= this.cfg.effects.slowedIntervalFactor;  // ◇
+
             // --- 물방울 스폰 ---
             this.state.spawnAccMs += dt * 1000;
-            const spawnInterval = this.state.boosted ? this.cfg.boostedSpawnInterval : this.cfg.dropSpawnInterval;
-            while (this.state.spawnAccMs >= spawnInterval) {
+            while (this.state.spawnAccMs >= effectiveSpawnInterval) {
                 this.spawnDrop();
-                this.state.spawnAccMs -= spawnInterval;
+                this.state.spawnAccMs -= effectiveSpawnInterval;
             }
 
             // --- 아이템 스폰 ---
@@ -120,15 +123,9 @@
             // --- 물방울 이동/충돌 ---
             const aliveDrops = [];
             for (const d of this.state.drops) {
-                d.y += this.cfg.dropSpeed * dt;
-                if (d.y + d.r >= groundY) {
-                    this.addScore(1);
-                    continue;
-                }
-                if (this.checkCollision(d)) {
-                    this.damageLife(1);
-                    continue;
-                }
+                d.y += effectiveDropSpeed * dt;
+                if (d.y + d.r >= groundY) { this.addScore(1); continue; }
+                if (this.checkCollision(d)) { this.damageLife(1); continue; }
                 if (d.y - d.r > this.cfg.height) continue;
                 aliveDrops.push(d);
             }
@@ -137,29 +134,22 @@
             // --- 아이템 이동/충돌 ---
             const aliveItems = [];
             for (const it of this.state.items) {
-                it.y += 160 * dt;
-                if (this.checkCollision(it)) {
-                    this.activateItem(it.type, ts);
-                    continue;
-                }
+                it.y += 160 * dt; // 아이템은 비교적 천천히
+                if (this.checkCollision(it)) { this.activateItem(it.type, ts); continue; }
                 if (it.y - it.r > this.cfg.height) continue;
                 aliveItems.push(it);
             }
             this.state.items = aliveItems;
 
-            // --- 효과 지속시간 종료 ---
-            if (this.state.boosted && ts > this.state.boostEndTime) {
-                this.state.boosted = false;
-            }
-            if (this.state.speedBoosted && ts > this.state.speedBoostEndTime) {
-                this.state.speedBoosted = false;
-            }
+            // --- 효과 만료 처리 ---
+            if (this.state.boosted && ts > this.state.boostEndTime) this.state.boosted = false;
+            if (this.state.slowed && ts > this.state.slowEndTime) this.state.slowed = false;
+            if (this.state.speedBoosted && ts > this.state.speedBoostEndTime) this.state.speedBoosted = false;
         },
 
         render() {
             const ctx = this.el.ctx;
-            const w = this.cfg.width;
-            const h = this.cfg.height;
+            const w = this.cfg.width, h = this.cfg.height;
 
             ctx.clearRect(0, 0, w, h);
             ctx.fillStyle = '#0b1020';
@@ -172,16 +162,15 @@
             // 물방울
             ctx.fillStyle = '#38bdf8';
             for (const d of this.state.drops) {
-                ctx.beginPath();
-                ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2); ctx.fill();
             }
 
             // 아이템들
             for (const it of this.state.items) {
-                if (it.type === 'circle') ctx.fillStyle = '#facc15'; // 노랑
-                else if (it.type === 'square') ctx.fillStyle = '#3b82f6'; // 파랑
-                else if (it.type === 'triangle') ctx.fillStyle = '#22c55e'; // 초록
+                if (it.type === 'circle') ctx.fillStyle = '#facc15';     // ○ 노랑
+                else if (it.type === 'square') ctx.fillStyle = '#3b82f6';// □ 파랑
+                else if (it.type === 'triangle') ctx.fillStyle = '#22c55e'; // △ 초록
+                else if (it.type === 'diamond') ctx.fillStyle = '#a855f7';  // ◇ 보라
 
                 if (it.type === 'square') {
                     ctx.fillRect(it.x - it.r, it.y - it.r, it.r * 2, it.r * 2);
@@ -192,24 +181,31 @@
                     ctx.lineTo(it.x + it.r, it.y + it.r);
                     ctx.closePath();
                     ctx.fill();
-                } else {
+                } else if (it.type === 'diamond') {
                     ctx.beginPath();
-                    ctx.arc(it.x, it.y, it.r, 0, Math.PI * 2);
+                    ctx.moveTo(it.x, it.y - it.r);
+                    ctx.lineTo(it.x + it.r, it.y);
+                    ctx.lineTo(it.x, it.y + it.r);
+                    ctx.lineTo(it.x - it.r, it.y);
+                    ctx.closePath();
                     ctx.fill();
+                } else {
+                    ctx.beginPath(); ctx.arc(it.x, it.y, it.r, 0, Math.PI * 2); ctx.fill();
                 }
             }
 
-            // 캐릭터
+            // 캐릭터(효과별 색상)
             let color = '#60a5fa';
-            if (this.state.boosted) color = '#fbbf24'; // 노란 (circle 효과)
-            if (this.state.speedBoosted) color = '#4ade80'; // 초록 (triangle 효과)
+            if (this.state.boosted) color = '#fbbf24';       // ○
+            if (this.state.speedBoosted) color = '#4ade80';  // △
+            if (this.state.slowed) color = '#a855f7';        // ◇
             ctx.fillStyle = color;
             ctx.fillRect(this.state.player.x, this.state.player.y, this.cfg.playerW, this.cfg.playerH);
 
             this.updateHUD();
         },
 
-        // ---------- 생성 ----------
+        // --- 스폰/아이템/효과 ---
         spawnDrop() {
             const pad = this.cfg.dropSpawnPadding;
             const x = Math.random() * (this.cfg.width - 2 * pad) + pad;
@@ -219,12 +215,11 @@
         spawnItem() {
             const pad = this.cfg.dropSpawnPadding;
             const x = Math.random() * (this.cfg.width - 2 * pad) + pad;
-            const types = ['circle', 'square', 'triangle'];
+            const types = ['circle', 'square', 'triangle', 'diamond'];
             const type = types[Math.floor(Math.random() * types.length)];
             this.state.items.push({ x, y: -this.cfg.itemRadius, r: this.cfg.itemRadius, type });
         },
 
-        // ---------- 아이템 효과 ----------
         activateItem(type, ts) {
             if (type === 'circle') {
                 this.state.boosted = true;
@@ -235,14 +230,14 @@
             } else if (type === 'triangle') {
                 this.state.speedBoosted = true;
                 this.state.speedBoostEndTime = ts + this.cfg.powerDuration;
+            } else if (type === 'diamond') {
+                this.state.slowed = true;
+                this.state.slowEndTime = ts + this.cfg.powerDuration;
             }
         },
 
-        // ---------- 기타 ----------
-        addScore(n = 1) {
-            this.state.score += n;
-            this.updateHUD();
-        },
+        // --- 유틸 ---
+        addScore(n = 1) { this.state.score += n; this.updateHUD(); },
 
         updateHUD() {
             this.el.hudScore.textContent = String(this.state.score);
@@ -250,8 +245,7 @@
         },
 
         checkCollision(obj) {
-            const p = this.state.player;
-            const r = obj.r;
+            const p = this.state.player, r = obj.r;
             const px = p.x + this.cfg.playerW / 2;
             const py = p.y + this.cfg.playerH / 2;
             const dx = Math.abs(obj.x - px);
@@ -268,11 +262,8 @@
         end() {
             if (!this.state.running) return;
             this.state.running = false;
-            try {
-                window.gameOver && window.gameOver(this.state.score);
-            } catch (e) {
-                console.error('[Engine] gameOver 호출 실패:', e);
-            }
+            try { window.gameOver && window.gameOver(this.state.score); }
+            catch (e) { console.error('[Engine] gameOver 호출 실패:', e); }
         },
     };
 
