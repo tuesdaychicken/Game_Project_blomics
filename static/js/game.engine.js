@@ -15,30 +15,7 @@
 
         el: { canvas: null, ctx: null, hudScore: null, hudLives: null },
 
-        state: {
-            running: false,
-            lastTs: 0,
-            score: 0,
-            lives: 1,
-            keys: Object.create(null),
-            player: { x: 0, y: 0 },
-
-            drops: [],
-            items: [],
-
-            // 타이머
-            spawnAccMs: 0,
-            itemAccMs: 0,
-            elapsedMs: 0, // 시작 이후 누적 시간
-
-            // 효과 상태
-            boosted: false,        // ○: 스폰 간격↓
-            boostEndTime: 0,
-            slowed: false,         // ◇: 속도↓, 스폰 간격↑
-            slowEndTime: 0,
-            speedBoosted: false,   // △: 플레이어 이동속도↑
-            speedBoostEndTime: 0,
-        },
+        state: window.GameStateFactory.create(),
 
         init() {
             this.el.canvas = document.getElementById('game-canvas');
