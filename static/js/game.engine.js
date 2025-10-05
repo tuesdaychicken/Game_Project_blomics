@@ -11,11 +11,13 @@
 (function () {
     const Engine = {
 
+        // 설정/상태는 분리된 전역 모듈 참조
         cfg: window.GameSettings,
 
         el: { canvas: null, ctx: null, hudScore: null, hudLives: null },
 
         state: window.GameStateFactory.create(),
+        detachInput: null, // 입력 해제 함수 보관
 
         init() {
             this.el.canvas = document.getElementById('game-canvas');
@@ -31,11 +33,16 @@
             this.state.player.x = (this.cfg.width - this.cfg.playerW) / 2;
             this.state.player.y = groundY - this.cfg.playerH;
 
+            // ✅ 입력 모듈로 키 이벤트 등록(상태의 keys만 갱신)
+            //    기존의 window.addEventListener('keydown'/'keyup')는 제거
+            this.detachInput = window.GameInput && window.GameInput.attach
+                ? window.GameInput.attach(this.state)
+                : null;
+
+            // ESC 즉시 종료(선택): keys와는 별개로 종료 핫키만 연결
             window.addEventListener('keydown', (e) => {
-                this.state.keys[e.key] = true;
                 if (e.key === 'Escape') this.end();
             });
-            window.addEventListener('keyup', (e) => (this.state.keys[e.key] = false));
 
             this.updateHUD();
             this.state.running = true;
@@ -239,6 +246,10 @@
         end() {
             if (!this.state.running) return;
             this.state.running = false;
+
+            // 입력 이벤트 정리
+            try { this.detachInput && this.detachInput(); } catch {}
+
             try { window.gameOver && window.gameOver(this.state.score); }
             catch (e) { console.error('[Engine] gameOver 호출 실패:', e); }
         },
