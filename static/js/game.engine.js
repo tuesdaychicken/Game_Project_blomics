@@ -1,17 +1,8 @@
 // static/js/game.engine.js
-// 1단계(완): 캔버스/루프/캐릭터 이동/HUD
-// 2단계(추가): 낙하물(물방울) 스폰/이동/지면 착지 시 점수 +1
-// 3단계: 물방울 충돌 시 목숨 감소 + 목숨 0 시 종료
-// 4단계: 동그라미 아이템 추가 (물방울 생성 속도 증가 5초 지속)
-// 5단계: 네모 아이템 추가 (목숨 +1)
-// 6단계: 세모 아이템 추가 (캐릭터 이동속도 증가 5초 지속)
-// 7단계: 마름모 아이템 추가 (물방울 속도/양 감소 5초 지속)
-// 8단계: 난이도 스케일링(경과 시간에 따라 낙하 속도↑, 스폰 간격↓) + 4종 아이템 유지
 
 (function () {
     const Engine = {
 
-        // 설정/상태는 분리된 전역 모듈 참조
         cfg: window.GameSettings,
 
         el: { canvas: null, ctx: null, hudScore: null, hudLives: null },
@@ -33,18 +24,17 @@
             this.state.player.x = (this.cfg.width - this.cfg.playerW) / 2;
             this.state.player.y = groundY - this.cfg.playerH;
 
-            // ✅ 입력 모듈로 키 이벤트 등록(상태의 keys만 갱신)
-            //    기존의 window.addEventListener('keydown'/'keyup')는 제거
+            // 입력 모듈 (상태의 keys만 갱신)
             this.detachInput = window.GameInput && window.GameInput.attach
                 ? window.GameInput.attach(this.state)
                 : null;
 
-            // ESC 즉시 종료(선택): keys와는 별개로 종료 핫키만 연결
-            window.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') this.end();
-            });
+            // ESC 종료 핫키
+            window.addEventListener('keydown', (e) => { if (e.key === 'Escape') this.end(); });
 
-            this.updateHUD();
+            // HUD 초기 반영
+            window.GameView.updateHUD(this.el, this.state);
+
             this.state.running = true;
             requestAnimationFrame(this.loop.bind(this));
         },
@@ -97,7 +87,7 @@
                 this.state.spawnAccMs -= effectiveSpawnInterval;
             }
 
-            // --- 아이템 스폰 ---
+            // --- 아이템 스폰 (확률) ---
             this.state.itemAccMs += dt * 1000;
             while (this.state.itemAccMs >= this.cfg.itemSpawnInterval) {
                 this.state.itemAccMs -= this.cfg.itemSpawnInterval;
@@ -132,70 +122,21 @@
         },
 
         render() {
-            const ctx = this.el.ctx;
-            const w = this.cfg.width, h = this.cfg.height;
+            // 🎨 화면 그리기 전담 모듈 호출
+            window.GameView.draw(this.el.ctx, this.state, this.cfg);
 
-            ctx.clearRect(0, 0, w, h);
-            ctx.fillStyle = '#0b1020';
-            ctx.fillRect(0, 0, w, h);
-
-            const groundY = h - this.cfg.groundH;
-            ctx.fillStyle = '#1f2937';
-            ctx.fillRect(0, groundY, w, this.cfg.groundH);
-
-            // 물방울
-            ctx.fillStyle = '#38bdf8';
-            for (const d of this.state.drops) {
-                ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2); ctx.fill();
-            }
-
-            // 아이템들
-            for (const it of this.state.items) {
-                if (it.type === 'circle') ctx.fillStyle = '#facc15';     // ○ 노랑
-                else if (it.type === 'square') ctx.fillStyle = '#3b82f6';// □ 파랑
-                else if (it.type === 'triangle') ctx.fillStyle = '#22c55e'; // △ 초록
-                else if (it.type === 'diamond') ctx.fillStyle = '#a855f7';  // ◇ 보라
-
-                if (it.type === 'square') {
-                    ctx.fillRect(it.x - it.r, it.y - it.r, it.r * 2, it.r * 2);
-                } else if (it.type === 'triangle') {
-                    ctx.beginPath();
-                    ctx.moveTo(it.x, it.y - it.r);
-                    ctx.lineTo(it.x - it.r, it.y + it.r);
-                    ctx.lineTo(it.x + it.r, it.y + it.r);
-                    ctx.closePath();
-                    ctx.fill();
-                } else if (it.type === 'diamond') {
-                    ctx.beginPath();
-                    ctx.moveTo(it.x, it.y - it.r);
-                    ctx.lineTo(it.x + it.r, it.y);
-                    ctx.lineTo(it.x, it.y + it.r);
-                    ctx.lineTo(it.x - it.r, it.y);
-                    ctx.closePath();
-                    ctx.fill();
-                } else {
-                    ctx.beginPath(); ctx.arc(it.x, it.y, it.r, 0, Math.PI * 2); ctx.fill();
-                }
-            }
-
-            // 캐릭터(효과별 색상)
-            let color = '#60a5fa';
-            if (this.state.boosted) color = '#fbbf24';       // ○
-            if (this.state.speedBoosted) color = '#4ade80';  // △
-            if (this.state.slowed) color = '#a855f7';        // ◇
-            ctx.fillStyle = color;
-            ctx.fillRect(this.state.player.x, this.state.player.y, this.cfg.playerW, this.cfg.playerH);
-
-            this.updateHUD();
+            // HUD 반영
+            window.GameView.updateHUD(this.el, this.state);
         },
 
-        // --- 스폰/아이템/효과 ---
+        // --- 낙하물(물방울) ---
         spawnDrop() {
             const pad = this.cfg.dropSpawnPadding;
             const x = Math.random() * (this.cfg.width - 2 * pad) + pad;
             this.state.drops.push({ x, y: -this.cfg.dropRadius, r: this.cfg.dropRadius });
         },
 
+        // --- 아이템(스폰/효과) ---
         spawnItem() {
             const pad = this.cfg.dropSpawnPadding;
             const x = Math.random() * (this.cfg.width - 2 * pad) + pad;
@@ -210,7 +151,6 @@
                 this.state.boostEndTime = ts + this.cfg.powerDuration;
             } else if (type === 'square') {
                 this.state.lives = Math.min(this.cfg.maxLives, this.state.lives + 1);
-                this.updateHUD();
             } else if (type === 'triangle') {
                 this.state.speedBoosted = true;
                 this.state.speedBoostEndTime = ts + this.cfg.powerDuration;
@@ -218,15 +158,12 @@
                 this.state.slowed = true;
                 this.state.slowEndTime = ts + this.cfg.powerDuration;
             }
+            // 아이템 픽업 즉시 HUD가 바뀔 수 있으므로 반영
+            window.GameView.updateHUD(this.el, this.state);
         },
 
-        // --- 유틸 ---
-        addScore(n = 1) { this.state.score += n; this.updateHUD(); },
-
-        updateHUD() {
-            this.el.hudScore.textContent = String(this.state.score);
-            this.el.hudLives.textContent = String(this.state.lives);
-        },
+        // --- 유틸/HUD/경계 ---
+        addScore(n = 1) { this.state.score += n; window.GameView.updateHUD(this.el, this.state); },
 
         checkCollision(obj) {
             const p = this.state.player, r = obj.r;
@@ -239,7 +176,7 @@
 
         damageLife(n = 1) {
             this.state.lives = Math.max(0, this.state.lives - n);
-            this.updateHUD();
+            window.GameView.updateHUD(this.el, this.state);
             if (this.state.lives <= 0) this.end();
         },
 
