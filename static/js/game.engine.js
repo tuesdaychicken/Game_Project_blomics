@@ -98,7 +98,6 @@
                 d.y += effectiveDropSpeed * dt;
                 if (d.y + d.r >= groundY) { this.addScore(1); continue; }
 
-                // 🔁 충돌 판정: GameHelpers 사용
                 const rx = this.state.player.x;
                 const ry = groundY - this.cfg.playerH;
                 const hitPlayer = window.GameHelpers.circleRectIntersect(
@@ -116,7 +115,6 @@
             for (const it of this.state.items) {
                 it.y += 160 * dt; // 아이템은 비교적 천천히
 
-                // 🔁 충돌 판정: GameHelpers 사용
                 const rx = this.state.player.x;
                 const ry = groundY - this.cfg.playerH;
                 const caught = window.GameHelpers.circleRectIntersect(
@@ -192,8 +190,9 @@
             // 입력 이벤트 정리
             try { this.detachInput && this.detachInput(); } catch {}
 
-            try { window.gameOver && window.gameOver(this.state.score); }
-            catch (e) { console.error('[Engine] gameOver 호출 실패:', e); }
+            // 🌐 바운더리: 게임오버를 브리지에 통지
+            try { window.GameBridge && window.GameBridge.gameOver(this.state.score); }
+            catch (e) { console.error('[Engine] GameBridge.gameOver failed:', e); }
         },
     };
 
