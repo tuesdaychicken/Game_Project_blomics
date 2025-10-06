@@ -9,6 +9,7 @@
 
         state: window.GameStateFactory.create(),
         detachInput: null, // 입력 해제 함수 보관
+        stopLoop: null,      // 루프 정지 함수
 
         init() {
             this.el.canvas = document.getElementById('game-canvas');
@@ -36,19 +37,12 @@
             window.GameView.updateHUD(this.el, this.state);
 
             this.state.running = true;
-            requestAnimationFrame(this.loop.bind(this));
-        },
-
-        loop(ts) {
-            if (!this.state.running) return;
-            if (!this.state.lastTs) this.state.lastTs = ts;
-            const dt = Math.min((ts - this.state.lastTs) / 1000, 0.033);
-            this.state.lastTs = ts;
-            this.state.elapsedMs += dt * 1000;
-
-            this.update(dt, ts);
-            this.render();
-            requestAnimationFrame(this.loop.bind(this));
+            this.stopLoop = window.GameLoop.start({
+                update: this.update.bind(this),
+                render: this.render.bind(this),
+                isRunning: () => this.state.running,
+                maxDt: 0.033,
+            });
         },
 
         update(dt, ts) {
