@@ -8,7 +8,7 @@
         el: { canvas: null, ctx: null, hudScore: null, hudLives: null },
 
         state: window.GameStateFactory.create(),
-        detachInput: null, // 입력 해제 함수 보관
+        detachInput: null,   // 입력 해제 함수
         stopLoop: null,      // 루프 정지 함수
 
         init() {
@@ -25,17 +25,18 @@
             this.state.player.x = (this.cfg.width - this.cfg.playerW) / 2;
             this.state.player.y = groundY - this.cfg.playerH;
 
-            // 입력 모듈 (상태의 keys만 갱신)
+            // 입력(키 스냅샷)
             this.detachInput = window.GameInput && window.GameInput.attach
                 ? window.GameInput.attach(this.state)
                 : null;
 
-            // ESC 종료 핫키
+            // ESC 종료
             window.addEventListener('keydown', (e) => { if (e.key === 'Escape') this.end(); });
 
-            // HUD 초기 반영
+            // HUD 초기 표시
             window.GameView.updateHUD(this.el, this.state);
 
+            // 실행 시작 + 🔁 루프 가동
             this.state.running = true;
             this.stopLoop = window.GameLoop.start({
                 update: this.update.bind(this),
@@ -46,6 +47,9 @@
         },
 
         update(dt, ts) {
+            // 누적 경과시간(ms)
+            this.state.elapsedMs += dt * 1000;
+
             // --- 플레이어 이동(△ 효과 시 가속) ---
             let moveSpeed = this.cfg.moveSpeed;
             if (this.state.speedBoosted) moveSpeed *= 1.5;
@@ -93,7 +97,15 @@
             for (const d of this.state.drops) {
                 d.y += effectiveDropSpeed * dt;
                 if (d.y + d.r >= groundY) { this.addScore(1); continue; }
-                if (this.checkCollision(d)) { this.damageLife(1); continue; }
+
+                // 🔁 충돌 판정: GameHelpers 사용
+                const rx = this.state.player.x;
+                const ry = groundY - this.cfg.playerH;
+                const hitPlayer = window.GameHelpers.circleRectIntersect(
+                    d.x, d.y, d.r, rx, ry, this.cfg.playerW, this.cfg.playerH
+                );
+                if (hitPlayer) { this.damageLife(1); continue; }
+
                 if (d.y - d.r > this.cfg.height) continue;
                 aliveDrops.push(d);
             }
@@ -103,7 +115,15 @@
             const aliveItems = [];
             for (const it of this.state.items) {
                 it.y += 160 * dt; // 아이템은 비교적 천천히
-                if (this.checkCollision(it)) { this.activateItem(it.type, ts); continue; }
+
+                // 🔁 충돌 판정: GameHelpers 사용
+                const rx = this.state.player.x;
+                const ry = groundY - this.cfg.playerH;
+                const caught = window.GameHelpers.circleRectIntersect(
+                    it.x, it.y, it.r, rx, ry, this.cfg.playerW, this.cfg.playerH
+                );
+                if (caught) { this.activateItem(it.type, ts); continue; }
+
                 if (it.y - it.r > this.cfg.height) continue;
                 aliveItems.push(it);
             }
@@ -116,9 +136,8 @@
         },
 
         render() {
-            // 🎨 화면 그리기 전담 모듈 호출
+            // 🎨 화면 그리기 전담
             window.GameView.draw(this.el.ctx, this.state, this.cfg);
-
             // HUD 반영
             window.GameView.updateHUD(this.el, this.state);
         },
@@ -152,21 +171,11 @@
                 this.state.slowed = true;
                 this.state.slowEndTime = ts + this.cfg.powerDuration;
             }
-            // 아이템 픽업 즉시 HUD가 바뀔 수 있으므로 반영
             window.GameView.updateHUD(this.el, this.state);
         },
 
         // --- 유틸/HUD/경계 ---
         addScore(n = 1) { this.state.score += n; window.GameView.updateHUD(this.el, this.state); },
-
-        checkCollision(obj) {
-            const p = this.state.player, r = obj.r;
-            const px = p.x + this.cfg.playerW / 2;
-            const py = p.y + this.cfg.playerH / 2;
-            const dx = Math.abs(obj.x - px);
-            const dy = Math.abs(obj.y - py);
-            return dx < this.cfg.playerW / 2 + r && dy < this.cfg.playerH / 2 + r;
-        },
 
         damageLife(n = 1) {
             this.state.lives = Math.max(0, this.state.lives - n);
@@ -178,6 +187,8 @@
             if (!this.state.running) return;
             this.state.running = false;
 
+            // 🔁 루프 정지
+            try { this.stopLoop && this.stopLoop(); } catch {}
             // 입력 이벤트 정리
             try { this.detachInput && this.detachInput(); } catch {}
 
