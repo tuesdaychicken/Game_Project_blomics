@@ -63,7 +63,7 @@
                 state.lives = Math.max(0, state.lives - 1);
                 if (state.lives <= 0) { hooks?.end?.(); return; }
                 continue;
-            }
+            } 
 
             // 화면 밖 하단 제거
             if (d.y - d.r > cfg.height) continue;

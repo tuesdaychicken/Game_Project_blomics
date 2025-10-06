@@ -31,7 +31,7 @@
             return await API.saveScore(score); // 기대 응답: { highScore, lastScore }
         }
         // 직접 호출
-        const res = await fetch('/api/scores', {
+        const res = await fetch('/api/board/scores', {
             method: 'POST',
             credentials: 'same-origin',
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },

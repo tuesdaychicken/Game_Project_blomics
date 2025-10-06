@@ -1,6 +1,4 @@
 // static/js/api.js
-// fetch api 사용
-
 
 const API = (() => {
     const BASE = '/api';
@@ -33,7 +31,7 @@ const API = (() => {
             }).then(handle),
 
         saveScore: (score) =>
-            fetch(`${BASE}/scores`, {
+            fetch(`${BASE}/board/scores`, {
                 method: 'POST',
                 headers: JSON_HEADERS,
                 body: JSON.stringify({ score }),
@@ -41,7 +39,7 @@ const API = (() => {
             }).then(handle),
 
         getScores: () =>
-            fetch(`${BASE}/scores/me`, {
+            fetch(`${BASE}/board/scores`, {
                 credentials: 'same-origin',
             }).then(handle),
     };
