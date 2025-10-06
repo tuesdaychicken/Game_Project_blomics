@@ -1,5 +1,4 @@
 // play.page.js
-
 (function () {
     const btnFinish = document.getElementById('btn-finish');
     const btnCancel = document.getElementById('btn-cancel');
@@ -41,7 +40,6 @@
         if (!res.ok) {
             const text = await res.text().catch(() => '');
             const err = new Error(`HTTP ${res.status}: ${text.slice(0,120)}`);
-            // 상태코드도 달아줌
             err.status = res.status;
             throw err;
         }
@@ -63,7 +61,7 @@
         if (endModal) endModal.style.display = 'none';
     }
 
-    // 게임 종료 시 호출 (랜덤/실제 점수 모두 지원)
+    // 게임 종료 시 호출 (엔진 → GameBridge → 여기)
     async function onGameOver(score) {
         if (!Number.isFinite(score)) {
             console.warn('[play] 잘못된 score:', score);
@@ -92,7 +90,12 @@
         }
     }
 
-    // 랜덤 점수 저장/표시
+    // 브리지에 게임오버 핸들러 등록
+    if (window.GameBridge?.setGameOverHandler) {
+        window.GameBridge.setGameOverHandler(onGameOver);
+    }
+
+    // 랜덤 점수 저장/표시 (테스트 버튼)
     btnFinish?.addEventListener('click', () => {
         const randomScore = Math.floor(Math.random() * 100); // 0~99 임의 점수
         onGameOver(randomScore);
@@ -109,6 +112,4 @@
         location.href = '/game';
     });
 
-    // 실제 게임 엔진에서 호출할 수 있도록 전역 공개
-    window.gameOver = onGameOver;
 })();

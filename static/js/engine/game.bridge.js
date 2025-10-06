@@ -10,7 +10,6 @@
     function gameOver(score) {
         try {
             if (gameOverHandler) return gameOverHandler(score);
-            if (typeof window.gameOver === 'function') return window.gameOver(score); // fallback
             console.warn('[GameBridge] No gameOver handler set.');
         } catch (e) {
             console.error('[GameBridge] gameOver handler error:', e);
