@@ -1,0 +1,46 @@
+#end-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.5);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+
+#end-modal .modal-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    width: min(92vw, 420px);
+    box-shadow: 0 10px 30px rgba(0,0,0,.2);
+    text-align: center;
+}
+
+#end-modal h2 { margin: 0 0 8px; font-size: 20px; }
+#end-modal .modal-sub { margin: 0 0 12px; color: #6b7280; }
+
+#end-modal .score-grid {
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    padding: 10px 0;
+}
+
+#end-modal .score-box {
+    flex: 1;
+    border: 1px dashed #e5e7eb;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+#end-modal .score-label { color: #6b7280; font-size: 12px; }
+#end-modal .score-value { font-weight: 700; font-size: 24px; }
+
+#btn-end-ok {
+    margin-top: 12px;
+    padding: 10px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #f9fafb;
+}

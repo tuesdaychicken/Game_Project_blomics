@@ -1,0 +1,74 @@
+/* 전역도 flex로 */
+html, body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: system-ui, -apple-system, "Noto Sans KR", sans-serif;
+}
+
+/* 상단/본문 래퍼 */
+.play-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    width: 100%;
+}
+
+/* 기존 #stage 중앙, 내부 세로 스택 */
+#stage {
+    position: relative;
+    width: 480px;
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 캔버스 시각 동일 */
+#game-canvas {
+    display: block;
+    background: #0b1020;
+    border-radius: 12px;
+}
+
+/* HUD는 기존 절대배치 + 내부 flex */
+#hud {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .6);
+    pointer-events: none;
+}
+
+/* 지면 표시(기존) */
+#ground {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 24px;
+    background: #1f2937;
+    border-radius: 0 0 12px 12px;
+    pointer-events: none;
+}
+
+/* 버튼 영역도 flex 중앙 */
+.controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+}
