@@ -1,22 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
-import { RequestMethod } from '@nestjs/common';
 
 //쿠키 추가
 import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
-
-    // /api 아래로 몰아서, '/' 정적 페이지와 충돌 방지
-    app.setGlobalPrefix('api',{
-        exclude: [
-            { path: 'game',   method: RequestMethod.GET },
-            { path: 'play',   method: RequestMethod.GET },
-            { path: 'scores', method: RequestMethod.GET },
-        ],
-    });
 
     const cfg = app.get(ConfigService);
     const port = cfg.get<number>('PORT', 3000);

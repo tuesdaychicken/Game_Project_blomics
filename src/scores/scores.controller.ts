@@ -4,7 +4,7 @@ import {ScoresService} from './scores.service';
 import {SubmitScoreDto} from './dto/submit-score.dto';
 
 //확장을 하더라도 점수만 관련된 확장이 되도록 설계
-@Controller('board') // 전역 프리픽스 'api'가 있음
+@Controller('scores') // 전역 프리픽스 'api'가 있음
 export class ScoresController {
     private readonly logger = new Logger(ScoresController.name);
 
@@ -13,13 +13,13 @@ export class ScoresController {
 
     // 점수 저장, 최근 점수계속 바꾸고, 최고 점수는 더 클 때만 업데이트
     @UsePipes(new ValidationPipe({whitelist: true}))
-    @Post('/scores')
+    @Post()
     async submitScore(
         @Body() body: SubmitScoreDto,
         @Req() req: Request,
     ) {
         const uid = req.cookies?.uid;
-        this.logger.log(`POST /board/scores, 점수 저장, uid=${uid ?? '없음'}, body=${JSON.stringify(body)}`);
+        this.logger.log(`POST /scores, 점수 저장, uid=${uid ?? '없음'}, body=${JSON.stringify(body)}`);
 
         //쿠기 없으면 401뜨기에 이렇게
         if (!uid) {
@@ -45,10 +45,10 @@ export class ScoresController {
     }
 
     // 점수 조회
-    @Get('scores')
+    @Get()
     async getScores(@Req() req: Request) {
         const uid = req.cookies?.uid;
-        this.logger.log(`GET board//scores/me, 점수 불러오기, uid=${uid ?? '없음'}`);
+        this.logger.log(`GET /scores, 점수 불러오기, uid=${uid ?? '없음'}`);
 
         //쿠키 없음
         if (!uid) {

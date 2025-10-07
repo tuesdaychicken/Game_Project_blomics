@@ -1,4 +1,4 @@
-// scores.page.hs
+// scores.page.js
 
 (async function init() {
     const statusEl  = document.getElementById('status');
@@ -15,8 +15,6 @@
             headers: { 'Accept': 'application/json' },
         });
         if (!res.ok) {
-            // 404면 다음 후보로 넘어가게
-            if (res.status === 404) throw new Error('NOT_FOUND');
             const text = await res.text().catch(() => '');
             throw new Error(`HTTP ${res.status} from ${url}: ${text.slice(0,120)}`);
         }
@@ -28,23 +26,19 @@
         return res.json();
     }
 
-    // /api/me → 없으면 /me
-    async function getMeAuto() {
-        try {
-            return await callMe('/api/me');
-        } catch (e) {
-            if (e.message === 'NOT_FOUND') {
-                return await callMe('/me'); // 글로벌 프리픽스가 없는 프로젝트용
-            }
-            throw e; // 그 외 에러는 상위에서 처리
+    // ✅ 현재 구조에 맞게 /me만 호출 (전역 prefix 없음)
+    async function getMe() {
+        // api.js가 로드되어 있으면 그걸 우선 사용
+        if (window.API && typeof API.me === 'function') {
+            return API.me();
         }
+        // fallback: 직접 호출
+        return callMe('/me');
     }
 
     try {
         // 내 정보 가져오기
-        const me = (window.api && typeof window.api.me === 'function')
-            ? await window.api.me()
-            : await getMeAuto();
+        const me = await getMe();
 
         // 미등록(쿠키 없음/무효) 처리
         if (!me || me.exists === false) {

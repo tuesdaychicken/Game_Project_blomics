@@ -1,4 +1,4 @@
-// play.page.js
+// static/js/play.page.js (정리본: fetch fallback 제거, API 전용)
 (function () {
     const btnFinish = document.getElementById('btn-finish');
     const btnCancel = document.getElementById('btn-cancel');
@@ -17,7 +17,7 @@
                 alert('세션이 만료되었거나 닉네임이 없습니다. 로비로 이동합니다.');
                 location.href = '/';
             }
-            // 실제게임 로직 여기
+            // 실제 게임 로직 진입 지점
         } catch (e) {
             console.error('[play] /me 실패:', e);
             alert('서버 연결에 문제가 있습니다.');
@@ -25,30 +25,12 @@
         }
     })();
 
-    // /api/scores 저장 호출 (API.saveScore 있으면 사용, 없으면 fetch fallback)
+    // 점수 저장: api.js만 사용
     async function saveScore(score) {
-        if (window.API && typeof API.saveScore === 'function') {
-            return await API.saveScore(score); // 기대 응답: { highScore, lastScore }
+        if (!window.API || typeof API.saveScore !== 'function') {
+            throw new Error('API.saveScore가 없습니다. api.js 로딩을 확인하세요.');
         }
-        // 직접 호출
-        const res = await fetch('/api/board/scores', {
-            method: 'POST',
-            credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify({ score })
-        });
-        if (!res.ok) {
-            const text = await res.text().catch(() => '');
-            const err = new Error(`HTTP ${res.status}: ${text.slice(0,120)}`);
-            err.status = res.status;
-            throw err;
-        }
-        const ct = res.headers.get('content-type') || '';
-        if (!ct.includes('application/json')) {
-            const text = await res.text().catch(() => '');
-            throw new Error(`NON_JSON 응답: ${text.slice(0,120)}`);
-        }
-        return res.json(); // { highScore, lastScore }
+        return API.saveScore(score); // 기대 응답: { highScore, lastScore }
     }
 
     // 모달 열기/닫기
@@ -79,10 +61,11 @@
             openEndModal({ current: last, high });
         } catch (err) {
             console.error('[play] 점수 저장 실패:', err);
-            if (err?.status === 401) {
+            const status = err?.status ?? 0;
+            if (status === 401) {
                 alert('세션이 만료되었습니다. 닉네임을 다시 등록해주세요.');
                 location.href = '/';
-            } else if (err?.status === 400) {
+            } else if (status === 400) {
                 alert('점수 형식이 올바르지 않습니다.');
             } else {
                 alert('점수 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
@@ -111,5 +94,4 @@
         closeEndModal();
         location.href = '/game';
     });
-
 })();

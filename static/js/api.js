@@ -18,7 +18,7 @@ const API = (() => {
 
     return {
         register: (nickname) =>
-            fetch(`${BASE}/register`, {
+            fetch(`${BASE}/users`, {
                 method: 'POST',
                 headers: JSON_HEADERS,
                 body: JSON.stringify({ nickname }),
@@ -26,12 +26,12 @@ const API = (() => {
             }).then(handle),
 
         me: () =>
-            fetch(`${BASE}/me`, {
+            fetch(`${BASE}/users`, {
                 credentials: 'same-origin',
             }).then(handle),
 
         saveScore: (score) =>
-            fetch(`${BASE}/board/scores`, {
+            fetch(`${BASE}/scores`, {
                 method: 'POST',
                 headers: JSON_HEADERS,
                 body: JSON.stringify({ score }),
@@ -39,8 +39,10 @@ const API = (() => {
             }).then(handle),
 
         getScores: () =>
-            fetch(`${BASE}/board/scores`, {
+            fetch(`${BASE}/scores`, {
                 credentials: 'same-origin',
             }).then(handle),
     };
 })();
+
+window.API = API;

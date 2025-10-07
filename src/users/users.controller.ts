@@ -3,7 +3,7 @@ import type { Request, Response } from 'express';
 import { UsersService } from './users.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 
-@Controller() // 전역 prefix가 api 절대 잊지말것
+@Controller('users') // 전역 prefix가 api 절대 잊지말것
 export class UsersController {
 
     //로그 생성
@@ -13,7 +13,7 @@ export class UsersController {
 
     // 닉네임 등록/수정
     @UsePipes(new ValidationPipe({ whitelist: true })) // DTO 유효성 검사
-    @Post('register')
+    @Post()
     async register(
         @Body() body: RegisterUserDto,
         @Req() req: Request,
@@ -21,7 +21,7 @@ export class UsersController {
     ) {
 
         // 들어온 값하고 쿠키 로그
-        this.logger.log(`users.controller POST /register 등록요청 body=${JSON.stringify(body)} cookies=${JSON.stringify(req.cookies || {})}`);
+        this.logger.log(`users.controller POST /users 등록요청 body=${JSON.stringify(body)} cookies=${JSON.stringify(req.cookies || {})}`);
 
         // 쿠키가 있는지 없는지 확인 후 값을 넘김
         const currentUid = req.cookies?.uid ?? null;
@@ -50,12 +50,12 @@ export class UsersController {
     }
 
     // 현재 로그인(=쿠키 보유) 유저 조회
-    @Get('me')
+    @Get()
     async me(@Req() req: Request, @Res() res: Response) {
         const uid = req.cookies?.uid;
 
         // Get 호출과 그에 따른 쿠키 로그
-        this.logger.log(`users.controller GET /me 조회해봄 uidCookie=${uid ?? '없음'}`);
+        this.logger.log(`users.controller GET /users 조회해봄 uidCookie=${uid ?? '없음'}`);
 
         if (!uid) {
             // 쿠키 없다
