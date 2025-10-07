@@ -18,9 +18,9 @@ export class PageController {
         return res.sendFile(join(PAGES_DIR, 'main.html'));
     }
 
-    @Get('play')
+    @Get('game')
     play(@Res() res: Response) {
-        return res.sendFile(join(PAGES_DIR, 'play.html'));
+        return res.sendFile(join(PAGES_DIR, 'game.html'));
     }
 
     @Get('scores')

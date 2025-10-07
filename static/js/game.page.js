@@ -1,4 +1,4 @@
-// static/js/play.page.js (정리본: fetch fallback 제거, API 전용)
+// static/js/game.page.js (정리본: fetch fallback 제거, API 전용)
 (function () {
     const btnFinish = document.getElementById('btn-finish');
     const btnCancel = document.getElementById('btn-cancel');

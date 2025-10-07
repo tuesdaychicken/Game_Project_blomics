@@ -26,7 +26,7 @@
 
     //플레이 페이지로
     btnStart?.addEventListener('click', () => {
-        location.href = '/play';
+        location.href = '/game';
     });
 
     //점수 페이지로
