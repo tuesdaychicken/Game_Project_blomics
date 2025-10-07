@@ -1,4 +1,4 @@
-// game.page.js
+// main.page.js
 
 (function () {
     const btnStart = document.getElementById('btn-start');

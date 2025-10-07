@@ -86,12 +86,12 @@
 
     // 취소
     btnCancel?.addEventListener('click', () => {
-        location.href = '/game';
+        location.href = '/main';
     });
 
     // 모달 확인, 로비로 이동
     btnEndOk?.addEventListener('click', () => {
         closeEndModal();
-        location.href = '/game';
+        location.href = '/main';
     });
 })();
