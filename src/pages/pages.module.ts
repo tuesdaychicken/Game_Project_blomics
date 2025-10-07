@@ -1,9 +1,7 @@
 import { Module } from '@nestjs/common';
-import { GamePageController } from './game.page.controller';
-import { PlayPageController } from './play.page.controller';
-import { ScoresPageController } from './scores.page.controller';
+import { PageController } from './page.controller';
 
 @Module({
-    controllers: [GamePageController, PlayPageController, ScoresPageController],
+    controllers: [PageController],
 })
 export class PagesModule {}

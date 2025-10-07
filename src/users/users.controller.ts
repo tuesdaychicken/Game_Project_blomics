@@ -2,8 +2,9 @@ import { Controller, Post, Get, Body, Req, Res, UsePipes, ValidationPipe, Logger
 import type { Request, Response } from 'express';
 import { UsersService } from './users.service';
 import { RegisterUserDto } from './dto/register-user.dto';
+import {join} from "path";
 
-@Controller('users') // 전역 prefix가 api 절대 잊지말것
+@Controller('users')
 export class UsersController {
 
     //로그 생성

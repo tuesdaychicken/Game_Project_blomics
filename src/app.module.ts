@@ -1,14 +1,14 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ServeStaticModule } from '@nestjs/serve-static';
+import {Module} from '@nestjs/common';
+import {ConfigModule, ConfigService} from '@nestjs/config';
+import {ServeStaticModule} from '@nestjs/serve-static';
 import * as path from 'path';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
-import { ScoresModule } from './scores/scores.module';
-import { PagesModule } from './pages/pages.module';
-import { RouterModule } from '@nestjs/core';
+import {TypeOrmModule} from '@nestjs/typeorm';
+import {AppController} from './app.controller';
+import {AppService} from './app.service';
+import {UsersModule} from './users/users.module';
+import {ScoresModule} from './scores/scores.module';
+import {PagesModule} from './pages/pages.module';
+import {RouterModule} from '@nestjs/core';
 
 @Module({
     imports: [
@@ -28,6 +28,10 @@ import { RouterModule } from '@nestjs/core';
                     {
                         rootPath: path.join(process.cwd(), root),
                         serveRoot: '/',
+                        serveStaticOptions: {
+                            // 루트로 접속하면 이 파일을 기본 문서로 반환
+                            index: 'loading.html',
+                        },
                     },
                 ];
             },
@@ -58,13 +62,14 @@ import { RouterModule } from '@nestjs/core';
             {
                 path: 'api',
                 children: [
-                    { path: '', module: ScoresModule },
-                    { path: '', module: UsersModule },
+                    {path: '', module: ScoresModule},
+                    {path: '', module: UsersModule},
                 ],
             },
         ]),
     ],
-    controllers: [AppController],
+    controllers: [],
     providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+}

@@ -1,4 +1,4 @@
-// index.page.js
+// join.page.js
 
 (function () {
     const form = document.getElementById('nickname-form');
@@ -13,7 +13,7 @@
         try {
             const me = await API.me();
             if (me?.exists) {
-                // 뒤로가기로 다시 index로 못 돌아오게
+                // 뒤로가기로 다시 join으로 못 돌아오게
                 location.replace('/game');
                 return;
             }
@@ -34,7 +34,7 @@
         try {
             await API.register(nickname); // uid 쿠키 발급
             help.textContent = '등록 완료! 게임 화면으로 이동합니다.';
-            location.href = '/game.html'; // 요구사항: index는 등록만, 게임은 game.html에서
+            location.href = '/game.html'; // 요구사항: join는 등록만, 게임은 game.html에서
         } catch (err) {
             help.textContent = `등록 실패: ${err.message || '알 수 없는 오류'}`;
         } finally {
