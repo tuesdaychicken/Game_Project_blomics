@@ -1,4 +1,5 @@
 // loading.page.js
+// 사용자 기존 유저인지 확인 페이지
 
 (function () {
     // 쿠키 확인

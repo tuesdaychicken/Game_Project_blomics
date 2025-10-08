@@ -1,4 +1,5 @@
 // scores.page.js
+// 점수 조회
 
 (async function init() {
     const statusEl  = document.getElementById('status');
@@ -26,7 +27,6 @@
         return res.json();
     }
 
-    // 현재 구조에 맞게 /me만 호출 (전역 prefix 없음)
     async function getMe() {
         // api.js가 로드되어 있으면 그걸 우선 사용
         if (window.API && typeof API.me === 'function') {

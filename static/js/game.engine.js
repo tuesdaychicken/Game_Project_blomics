@@ -1,13 +1,12 @@
 // static/js/game.engine.js
+// 전체적인 게임의 초기 배치 -> 입력 연결 -> 루프 -> 규칙 및 그리기 -> 종료 -> 브리지
 
 (function () {
     const Engine = {
 
-        cfg: window.GameSettings,
-
-        el: {canvas: null, ctx: null, hudScore: null, hudLives: null},
-
-        state: window.GameStateFactory.create(),
+        cfg: window.GameSettings,// 게임설정
+        el: {canvas: null, ctx: null, hudScore: null, hudLives: null},// 화면 요소
+        state: window.GameStateFactory.create(),// 게임상태
         detachInput: null,   // 입력 해제 함수
         stopLoop: null,      // 루프 정지 함수
 

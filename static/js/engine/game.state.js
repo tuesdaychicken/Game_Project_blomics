@@ -1,18 +1,20 @@
 // static/js/engine/game.state.js
-// 게임 상태 파일, 생성/초기화만
+// 게임 시작시 초기 상태 생성 및 초기화
+// 추후 확장한다면 게임의 상태를 변환하는 기능 또는 게임의 상태 변환(예시, 스테이지2)
 
 (function () {
-    // 상태 객체를 만들어 반환한다.
+
+    // 게임 상태 생성
     function createGameState() {
         return {
             // 실행 제어
             running: false,
             lastTs: 0,
-            elapsedMs: 0,     // 시작 이후 누적 ms
+            elapsedMs: 0,
 
             // HUD 데이터
             score: 0,
-            lives: 1,         // 요구사항: 시작 목숨 1
+            lives: 1,
 
             // 입력 스냅샷
             keys: Object.create(null),
@@ -29,29 +31,14 @@
             itemAccMs: 0,     // 아이템 스폰 누적(ms)
 
             // 아이템 효과(버프/디버프) 상태
-            boosted: false, boostEndTime: 0,        // ○ 스폰 간격 단축
-            slowed: false,  slowEndTime: 0,         // ◇ 속도↓/스폰 간격↑
-            speedBoosted: false, speedBoostEndTime: 0, // △ 이동속도↑
+            boosted: false, boostEndTime: 0,        // 동그라미, 낙하물 스폰 간격 단축
+            slowed: false,  slowEndTime: 0,         // 마름모, 낙하물 속도 속도/스폰 간격 증가
+            speedBoosted: false, speedBoostEndTime: 0, // 세모, 플레이어 이동속도 증가
         };
-    }
-
-    // 필요 시 전체 상태를 공장 초기값으로 덮어써서 리셋하는 도우미
-    function resetGameState(state) {
-        const fresh = createGameState();
-        // 얕은 복사로 기존 참조를 유지하면서 필드만 초기화
-        for (const k in state) {
-            // 배열은 비우기
-            if (Array.isArray(state[k])) {
-                state[k].length = 0;
-            } else {
-                state[k] = fresh[k];
-            }
-        }
     }
 
     // 전역 공개
     window.GameStateFactory = {
         create: createGameState,
-        reset: resetGameState,
     };
 })();

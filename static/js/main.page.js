@@ -1,4 +1,5 @@
 // main.page.js
+// 게임 메인 페이지
 
 (function () {
     const btnStart = document.getElementById('btn-start');

@@ -1,4 +1,5 @@
 // join.page.js
+// 사용자 쿠키발급 및 등록
 
 (function () {
     const form = document.getElementById('nickname-form');
