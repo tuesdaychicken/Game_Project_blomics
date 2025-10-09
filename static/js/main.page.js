@@ -1,29 +1,16 @@
 // main.page.js
 // 게임 메인 페이지
 
-(function () {
+(async function () {
     const btnStart = document.getElementById('btn-start');
     const btnCheck = document.getElementById('btn-check');
     const nickEl   = document.getElementById('current-nickname');
 
-    // 진입 시 계정 확인 (쿠키/세션 없으면 닉네임 등록으로)
-    (async () => {
-        try {
-            const me = await API.me(); // { exists: boolean }
-            if (!me?.exists) {
-                alert('닉네임을 먼저 등록해주세요.');
-                location.href = '/';
-            }
+    //사용자 검증
+    await ensureSignedIn({});
 
-            // 닉네임 주입
-            if (nickEl) nickEl.textContent = me.nickname ?? '(닉네임 없음)';
-            
-        } catch (e) {
-            console.error('[lobby] /me 실패:', e);
-            alert('서버 연결에 문제가 있습니다.');
-            location.href = '/';
-        }
-    })();
+    const me = await API.me();
+    nickEl.textContent = me.nickname ?? '(닉네임 없음)';
 
     //플레이 페이지로
     btnStart?.addEventListener('click', () => {

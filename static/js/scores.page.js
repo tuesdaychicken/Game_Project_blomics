@@ -14,6 +14,7 @@
     const actionsEl = document.getElementById('actions');
 
     try {
+        const me = await API.me();
         const scores = await API.getScores();
 
         if (statusEl) statusEl.textContent = '불러오기 완료';
