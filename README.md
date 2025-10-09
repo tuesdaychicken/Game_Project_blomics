@@ -1,99 +1,139 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Blomics Web Game
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 1) 프로젝트 한줄 요약
+- 웹에서 실행되는 피하기 게임과 NestJS(Node.js) + SQLite3 서버로 사용자 닉네임/점수를 관리하는 프로젝트.
+---
 
-## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## Project setup
+## 2) 과제 명세
+### 가. 프로그래밍 조건
+1. **웹 브라우저로 접속 시 브라우저에서 동작**
+    - HTML과 JS로 브라우저에서 작동
+2. **게임엔진 사용 자유**
+    - JS 파일로 엔진 구성(game.state.js, game.loop.js 등)
+3. **점수 요소 + 유저 상호작용 + 움직이는 이미지**
+    - 캔버스를 통해 프레임 단위로 움직이게 했으며, 키보드로 유저와 상호작용을 통한 점수 획득
+4. **서버 = Node.js, DB = SQLite3**
+    - Node.js (v22.17.0)
+    - SQLite3 (3.45.1)
+5. **서버 코드 수정 없이 환경변수만으로 접근**
+    - .env 파일 첨부
+6. **게임은 서버의 static serve 폴더에 포함**
+    - static 폴더에 구현
+7. **제출 구성요건**
+    - 서버 코드 폴더(blomics_server.zip), 문서(blomics_server.zip 파일 내 read.ME 문서)
 
-```bash
-$ npm install
+### 나. 기능 조건
+1. **첫 접속 시 닉네임 입력 및 저장**
+    - 접속 후 닉네임 입력 후 저장 순으로 구현
+2. **재접속 시 닉네임 재입력 없이 메인 페이지로**
+    - 쿠키여부 확인을 통해 재접속 여부 확인 후 메인 페이지로 이동
+3. **메인 페이지에 닉네임 표시, 게임 시작/점수 확인 버튼**
+    - 메인 페이지에 닉네임과 버튼 구현
+4. **게임 시작 버튼 → 게임 시작**
+    - 게임 시작 버튼 클릭 시 게임 시작
+5. **게임 종료 후 닉네임+점수 서버 전송, DB에 최고점 저장, 이번 점수/최고점 표시**
+    - 게임 종료 후 닉네임과 점수를 저장하고, 모달을 통해 최근점수와 최고점수 표시
+5. **점수 표시 후 메인 페이지로 복귀**
+    - 결과 모달창을 닫을 경우 메인 페이지로 이동
+5. **메인에서 점수 확인 버튼 → 서버에 닉네임 전송, 해당 유저 최고점 수신/표시**
+    - 점수 확인 버튼 클릭시 점수 페이지로 이동 -> 점수 페이지에서 최근점수와 최고점수 표시
+---
+
+
+
+## 3) 개발 환경
+### 백엔드 스택
+- 언어 : TypeScript
+- 런타임 : Node.js `v22.17.0`
+- 프레임워크 : NestJS
+- 패키지 매니저 : npm `10.9.2`
+- DB : SQLite3
+- ORM : TypeORM
+### 프론트엔드 스택
+- 언어 : JavaScript
+- 마크업/스타일 : HTML5, CSS3
+- 렌더링 : HTML5 Canvas
+- 네트워킹 : Fetch API
+- 게임 엔진 : JavaScript를 통해 만든 엔진
+---
+
+
+## 4) 환경설정 및 실행
+
+### 환경설정
+서버 및 데이터베이스 연결을 위한 환경 변수를 설정합니다.
+
+```dotenv
+PORT=
+STATIC_ROOT=
+DATABASE_PATH=
+COOKIE_SECRET=
 ```
 
-## Compile and run the project
+- **로컬 환경 실행**
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+> npm install -g @nestjs/cli
+> cd blomics_server
+> npm install # 프로젝트 디렉터리에서 라이브러리 설치
+> npm run build
+> npm run start:prod # 데이터베이스 테이블이 없을 경우 Create
 ```
 
-## Run tests
+### 접속
+http://localhost:3000/
 
-```bash
-# unit tests
-$ npm run test
+## 5) 데이터베이스 모델링
 
-# e2e tests
-$ npm run test:e2e
+## 6) API 명세
+| Title | Method | Path |
+| --- | --- | --- | 
+| 사용자 가입 | POST | `/api/users` |
+| 사용자 조회 | GET| `/api/users` |
+| 점수 저장 | POST | `/api/scores` |
+| 점수 조회 | GET | `/api/scores` |
 
-# test coverage
-$ npm run test:cov
-```
+- 사용자와 점수의 API 설계를 복잡하지 않게 위와 같이 설계하였습니다.
+- 라우팅 경로도 `/users`, `/scores`로 설계했습니다.
+- API 사용시 앞에 `/api`를 붙여 라우트와 혼동되지 않게 구분했습니다.
 
-## Deployment
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## 7) 구현내용 및 게임설명
+### 전체 흐름
+- 최초 접속시 `loading.html`에서 사용자 여부를 쿠키와 닉네임을 통해 확인 합니다.
+- 최초 사용자면 `join.html`로 이동합니다.
+- 기존(재접속) 사용자면 `main.html`로 이동합니다.
+- `main.html`에서 `게임시작`버튼과 `점수 확인`버튼을 통해 게임 시작 혹은 점수를 확인할 수 있습니다.
+- `game.html`에서 최초 게임을 플레이 한 후 종료되면 점수값을 서버로 전송하여 저장합니다.
+- 저장되는 값은 최초일 경우 최고값과 최근 값으로 저장됩니다.
+- 그 뒤로 진행되는 게임은 최고값과 비교하여 기존의 최고값 보다 클 경우 저장합니다. 최근 값은 계속 변경 됩니다.
+- 게임이 종료 되면 모달을 통해 점수를 확인합니다.
+- `scores.html`에서 사용자의 최근 값과 최고값을 확인합니다.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### 게임설명
+- 상단에서 `낙하물`이 떨어지며, `사용자`가 피하는 게임입니다.
+- 상단에서 떨어지는 `낙하물`이 `사용자`와 충돌할 경우 목숨값이 -1 됩니다.
+- 상단에서 떨어지는 `낙하물`이 `지면`에 충돌할 경우 점수값이 +1 됩니다.
+- `낙하물`은 시간이 지날수록 스폰간격이 줄어들어 더 많이 생성됩니다.
+- `낙하물`은 시간이 지날수록 낙하하는 속도가 증가하여 빠르게 내려옵니다.
+- 상단에서 `아이템`이 떨어지며, `사용자`와 접촉시 효과가 발동합니다.
+    - `동그라미` : 5초간 낙하물과 아이템의 스폰속도가 줄어듭니다.
+    - `세모` : 5초간 사용자의 이동속도가 증가합니다.
+    - `네모` : 사용자의 목숨값이 +1 증가합니다.
+    - `마름모` : 5초간 낙하물의 낙하속도는 감소하며, 스폰 간격이 길어집니다.
+- 목숨값이 0이 되면 게임은 종료됩니다.
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### 게임 엔진
+1. **game.engine.js** : 초기 배치부터 종료까지 전체적인 게임의 흐름을 관리 합니다.
+2. **game.bridge.js** : 게임 종료 시 game.page.js에 종료여부를 넘기고 점수 저장 API를 호출합니다.
+3. **game.helpers.js** : 게임진행시 자주 사용되는 함수로, 낙하물 충돌 여부와 플레이어가 화면 밖으로 벗어나지 않게 제한합니다.
+4. **game.input.js** : 키보드 입력 여부를 게임 상태에 반영합니다.
+5. **game.loop.js** : 게임의 입력과 상태에 따라 움직일 수 있도록 반복하는 함수입니다.
+6. **game.setting.js** : 게임의 모든 설정에 대한 값이 있습니다.
+7. **game.state.js** : 게임 시작시 초기 상태를 생성합니다.
+8. **game.update.js** : 상태/설정/충돌 여부를 반영하여 게임을 갱신합니다.
+9. **game.view.js** : 게임 화면을 구현합니다. 움직이는 부분은 아닙니다.
 

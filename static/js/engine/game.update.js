@@ -1,6 +1,5 @@
 // static/js/engine/game.update.js
-// 게임 규칙 함수 파일,
-// 리팩토링 필요
+// 게임 규칙 함수 파일
 
 (function () {
 

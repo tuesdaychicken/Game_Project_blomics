@@ -1,5 +1,5 @@
 //로그 추가
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -28,42 +28,28 @@ export class UsersService {
         return this.repo.findOne({ where: { nickname } });
     }
 
-    // 쿠키에 있으면 닉네임, 없으면 새로 생성
+    // 유저 생성
     async registerOrUpdate(id: string | null, nickname: string) {
-        //쿠키가 있으면 무슨 값이며 닉네임은 어떻게 되는지
-        this.logger.log(`users.service registerOrUpdate 호출, 등록 똔는 수정 id=${id ?? 'null'} nickname=${nickname}`);
+        this.logger.log(`users.service registerOrUpdate 호출 | id=${id ?? 'null'} nickname=${nickname}`);
 
-        //쿠키가 있는 사용자는 닉네임만 변경
+        // 쿠키가 있으면 그대로 사용자 조회해서 반환
         if (id) {
             const found = await this.findById(id);
-            if (found) {
-                //쿠키값과 닉네임값 확인 로그
-                this.logger.log(`users.service updateNickname 호출, 닉네임 변경 id=${id} -> ${found.nickname} -> ${nickname}`);
-
-                // 쿠키가 있는 기존 사용자: 닉네임만 변경
-                found.nickname = nickname;
-                return this.repo.save(found);
-            }
-            // 쿠키가 있는데 DB에 사용자가 없으면(희귀 케이스) 닉네임 기준으로 이어붙이기
-            this.logger.warn(`users.service 쿠키는 있지만 DB에 없음 | uid=${id} → 닉네임으로 재연결 시도`);
-        }
-        // 쿠키가 없으면 닉네임으로 기존 사용자 찾기
-        const byNick = await this.findByNickname(nickname);
-        if (byNick) {
-            //쿠키가 없어? 그럼 이전에 등록했던 유저였는지 확인 ㄱㄱ
-            this.logger.log(`users.service 기존 사용자 확인 nickname=${nickname} id=${byNick.id}`);
-
-            // 기존 유저면 그대로 반환(컨트롤러에서 이 id로 쿠키 발급)
-            return byNick;
+            this.logger.log(`users.service 기존 사용자 반환 | uid=${id} nickname=${found?.nickname ?? 'null'}`);
+            return found;
         }
 
-        // 없으면 새로 생성(점수 0으로 시작)
+        // 쿠키가 없으면 신규 등록
+        const exists = await this.findByNickname(nickname);
+        if (exists) {
+            this.logger.log(`users.service 닉네임 중복 | nickname=${nickname} id=${exists.id}`);
+            throw new ConflictException('이미 사용 중인 닉네임입니다.');
+        }
+
+        // 쿠키와 닉네임 중복 여부 확인 후 사용자 생성
         const created = this.repo.create({ nickname, highScore: 0, lastScore: 0 });
-
-        //로그를 찍어서 어떤 값 넘어가는지
         const saved = await this.repo.save(created);
-
-        this.logger.log(`users.service 신규 사용자임 등록 하겠음 id=${saved.id} nickname=${saved.nickname}`);
+        this.logger.log(`users.service 신규 사용자 생성 | id=${saved.id} nickname=${saved.nickname}`);
         return saved;
     }
 }

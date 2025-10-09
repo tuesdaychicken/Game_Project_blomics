@@ -27,13 +27,19 @@ export class UsersController {
         // 쿠키가 있는지 없는지 확인 후 값을 넘김
         const currentUid = req.cookies?.uid ?? null;
 
-        // 새유저 생성
+        // 새유저 생성 (또는 기존 사용자 반환)
         const saved = await this.users.registerOrUpdate(currentUid, body.nickname);
+
+        // 서비스가 null을 반환시 등록 실패
+        if (!saved) {
+            this.logger.warn(`users.controller 등록 실패 | uid=${currentUid ?? 'null'} nickname=${body?.nickname ?? ''}`);
+            return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
+        }
 
         //결과 로그 (점수는 기본 값이기에 일단 뺌 필요하면 다시 넣기)
         this.logger.log(`users.controller 등록완료 점수 기본 값은 0 -> id=${saved.id}, nickname=${saved.nickname}, hadCookie=${!!currentUid}`);
-        
-        // uid 쿠키가 없던 사용자였다면 새로 발급?
+
+        // uid 쿠키가 없던 사용자였다면 새로 발급
         if (!currentUid) {
             // httpOnly: JS에서 접근 불가(보안), sameSite: 기본 보안
             res.cookie('uid', saved.id, { httpOnly: true, sameSite: 'lax' });

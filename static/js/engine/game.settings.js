@@ -1,7 +1,6 @@
 // static/js/engine/game.settings.js
 //게임에 사용되는 모든 설정
 // 추후 확장한다면 기본설정, 낙하물_설정, 아이템_설정, 아이템효과_설정 이렇게 분리
-// 리팩토링 필요
 
 (function () {
     window.GameSettings = {

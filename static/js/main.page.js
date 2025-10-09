@@ -12,7 +12,7 @@
     const me = await API.me();
     nickEl.textContent = me.nickname ?? '(닉네임 없음)';
 
-    //플레이 페이지로
+    //게임 페이지로
     btnStart?.addEventListener('click', () => {
         location.href = '/game';
     });
