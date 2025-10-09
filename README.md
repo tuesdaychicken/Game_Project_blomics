@@ -86,7 +86,15 @@ COOKIE_SECRET=
 ### 접속
 http://localhost:3000/
 
-## 5) 데이터베이스 모델링
+## 5) 데이터베이스 모델링 
+Table : users
+
+| Column Names | Type | Attributes |
+| --- | --- | --- |
+| nickname| varchar(32) | Unique  |
+| highScore | integer | default: 0 |
+| lastScore |integer | default: 0 |
+| id   | varchar|  Primary Key|
 
 ## 6) API 명세
 | Title | Method | Path |
