@@ -2,6 +2,10 @@
 // 점수 조회
 
 (async function init() {
+
+    //사용자 검증
+    await ensureSignedIn({});
+
     const statusEl  = document.getElementById('status');
     const cardEl    = document.getElementById('score-card');
     const nickEl    = document.getElementById('nickname');
@@ -10,12 +14,6 @@
     const actionsEl = document.getElementById('actions');
 
     try {
-        // 사용자 검증
-        const me = await ensureSignedIn({
-            redirectTo: '/',
-            message: '닉네임이 등록되어 있지 않습니다. 로비로 이동합니다.',
-        });
-
         const scores = await API.getScores();
 
         if (statusEl) statusEl.textContent = '불러오기 완료';

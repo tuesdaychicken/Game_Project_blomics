@@ -2,7 +2,10 @@
 // 게임 종료 여부 확인 후 모달로 결과
 
 
-(function () {
+(async function () {
+
+    //사용자 검증
+    await ensureSignedIn({});
 
     // 종료 모달 요소
     const endModal   = document.getElementById('end-modal');
@@ -10,28 +13,12 @@
     const endHighEl  = document.getElementById('end-high');  // 최고 점수
     const btnEndOk   = document.getElementById('btn-end-ok');
 
-    // 진입 시 계정 확인
-    (async () => {
-        try {
-            const me = await API.me();
-            if (!me?.exists) {
-                alert('세션이 만료되었거나 닉네임이 없습니다. 로비로 이동합니다.');
-                location.href = '/';
-            }
-            // 실제 게임 로직 진입 지점
-        } catch (e) {
-            console.error('[play] /me 실패:', e);
-            alert('서버 연결에 문제가 있습니다.');
-            location.href = '/';
-        }
-    })();
-
     // 점수 저장
     async function saveScore(score) {
         if (!window.API || typeof API.saveScore !== 'function') {
             throw new Error('API.saveScore가 없습니다. api.js 로딩을 확인하세요.');
         }
-        return API.saveScore(score); // 기대 응답: { highScore, lastScore }
+        return API.saveScore(score);
     }
 
     // 모달 열기/닫기
