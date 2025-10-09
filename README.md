@@ -23,7 +23,7 @@
 6. **게임은 서버의 static serve 폴더에 포함**
     - static 폴더에 구현
 7. **제출 구성요건**
-    - 서버 코드 폴더(blomics_server.zip), 문서(blomics_server.zip 파일 내 read.ME 문서)
+    - 서버 코드 폴더(blomics_server.zip), 문서(blomics_server.zip 파일 내 README.md 문서)
 
 ### 나. 기능 조건
 1. **첫 접속 시 닉네임 입력 및 저장**
