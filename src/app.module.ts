@@ -13,13 +13,13 @@ import {RouterModule} from '@nestjs/core';
 @Module({
     imports: [
 
-        // .env 사용
+        // 4.  .env 사용
         ConfigModule.forRoot({
             isGlobal: true,
             envFilePath: ['.env'],
         }),
 
-        // 정적 폴더 서빙
+        // 5. 정적 폴더 서빙
         ServeStaticModule.forRootAsync({
             inject: [ConfigService],
             useFactory: (cfg: ConfigService) => {
@@ -45,7 +45,7 @@ import {RouterModule} from '@nestjs/core';
                 return {
                     type: 'sqlite',
                     database: dbPath,
-                    autoLoadEntities: true,
+                    autoLoadEntities: true, //프로젝트 전체에
                     synchronize: true,
                     logging: false,
                 };

@@ -6,15 +6,18 @@ import { ConfigService } from '@nestjs/config';
 import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
+
+    // 1. 앱생성
     const app = await NestFactory.create(AppModule);
 
     const cfg = app.get(ConfigService);
     const port = cfg.get<number>('PORT', 3000);
 
-    // 쿠키 서명용 시크릿 (환경변수에서 읽음)
+    // 2. 쿠키 서명용 시크릿 (환경변수에서 읽음)
     const cookieSecret = cfg.get<string>('COOKIE_SECRET', 'dev_secret_change_me');
     app.use(cookieParser(cookieSecret));
 
+    // 3. 포트 읽기
     await app.listen(port);
 
     console.log(`Server running on http://localhost:${port}`);

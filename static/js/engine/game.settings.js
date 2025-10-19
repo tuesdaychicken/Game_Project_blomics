@@ -26,7 +26,8 @@
 
         // 아이템
         itemRadius: 8, // 아이템 크기 기준
-        itemSpawnInterval: 3000, itemChance: 0.5, //일정 간격 아이템 스폰 검사 50%
+        itemSpawnInterval: 3000, //아이템 스폰 주기
+        itemChance: 0.5, // 주기에 맞게 50% 확률로 생성
         powerDuration: 5000, // 아이템 효과 만료시간(ms)
 
         // 아이템 효과 계수값
